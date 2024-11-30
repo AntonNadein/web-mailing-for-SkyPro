@@ -1,0 +1,18 @@
+{% extends 'mailing/base.html' %}
+{% block title %}Создание сообщения{% endblock %}
+
+{% block content %}
+
+<h2 class="mt-2 text-center">{% if object %}Редактирование{% else %}Создание{% endif %} сообщения</h2>
+<hr class="featurette-divider">
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for f in form %}
+            <p><label class="fs-5 ms-5" for="{{ f.id_for_label }}">{{ f.label }}:</label> {{ f }} </p>
+            <div class="fs-6"> {{ f.errors }}</div>
+            {% endfor %}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'mailing:recipient_list' %}" class="btn btn-primary">Отменить</a>
+</form>
+<hr class="featurette-divider">
+{% endblock %}

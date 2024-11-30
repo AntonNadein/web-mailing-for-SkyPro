@@ -1,11 +1,9 @@
 {% extends 'mailing/base.html' %}
-
+{% block title %}Получатели рассылки{% endblock %}
 
 {% block content %}
 
-<h2 class="mt-1 text-center">Статистика</h2>
-
-<h2 class="mt-2 text-center">Таблица</h2>
+<h2 class="mt-2 text-center">Получатели рассылки</h2>
 <table class="table table-striped">
     <thead>
     <tr>
@@ -14,6 +12,7 @@
         <th scope="col">Имя</th>
         <th scope="col">Отчество</th>
         <th scope="col">Email</th>
+        <th scope="col">Детали</th>
     </tr>
     </thead>
     <tbody>
@@ -28,6 +27,7 @@
         <td>-</td>
         {% endif %}
         <td>{{ recipient.email }}</td>
+        <td><a class="link" href="{% url 'mailing:recipient_detail' recipient.slug %}">Подробнее</a></td>
     </tr>
     {% endfor %}
     </tbody>

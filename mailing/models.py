@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class MailingRecipient(models.Model):
@@ -6,7 +7,7 @@ class MailingRecipient(models.Model):
 
     first_name = models.CharField(max_length=250, verbose_name="Имя")
     last_name = models.CharField(max_length=250, verbose_name="Фамилия")
-    patronymic = models.CharField(max_length=250, verbose_name="Отчество")
+    patronymic = models.CharField(max_length=250, null=True, blank=True, verbose_name="Отчество")
     email = models.EmailField(unique=True, verbose_name="Email")
     comment = models.TextField(null=True, blank=True, verbose_name="Коментарий")
     slug = models.SlugField(
@@ -20,8 +21,8 @@ class MailingRecipient(models.Model):
     def __str__(self):
         return f"{self.last_name} {self.first_name} {self.patronymic}"
 
-    # def get_absolute_url(self):
-    #     return reverse("mailing:mailing_detail", kwargs={"slug": self.slug})
+    def get_absolute_url(self):
+        return reverse("mailing:recipient_detail", kwargs={"slug": self.slug})
 
     class Meta:
         verbose_name = "получателя рассылки"
@@ -73,6 +74,10 @@ class Newsletter(models.Model):
         verbose_name = "рассылку"
         verbose_name_plural = "Рассылка"
 
+    @property
+    def human_readable_status(self):
+        return dict(self.STATUS).get(self.status, "Неизвестный статус")
+
 
 class AttemptToSend(models.Model):
     """Попытка рассылки"""
@@ -81,21 +86,14 @@ class AttemptToSend(models.Model):
     NOT_SUCCESSFULLY = False
 
     STATUS = [(SUCCESSFULLY, "Успешно"), (NOT_SUCCESSFULLY, "Не успешно")]
-    name = models.CharField(max_length=150, verbose_name="Название")
+
     attempts = models.DateTimeField(verbose_name="Дата и время попытки")
     status = models.BooleanField(choices=STATUS, verbose_name="Статус")
     server_response = models.TextField(verbose_name="Ответ почтового сервера")
-    newsletter = models.ForeignKey(
-        "Newsletter",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="newsletter",
-        verbose_name="Рассылка",
-    )
+    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f"Attempt on {self.attempts} - Status: {'Success' if self.status else 'Failure'}"
 
     class Meta:
         verbose_name = "попытки рассылок"

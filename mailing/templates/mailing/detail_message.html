@@ -1,0 +1,20 @@
+{% extends 'mailing/base.html' %}
+{% block title %}Детали сообщения{% endblock %}
+
+{% block content %}
+
+<hr class="featurette-divider">
+<h1 class="mt-5 text-center">Детали сообщения</h1>
+<div class="col-1"></div>
+<div class="col-10">
+    <div class="mt-5 card-body text-start">
+        <p class="card-text">Заголовок: {{ object.title }}</p>
+    <p>Текст сообщения: {{ object.body_message }}</p>
+        </div>
+    <div class="mt-5">
+    <a href="{% url 'mailing:message_update' object.pk %}" class="btn btn-secondary">Редактировать</a>
+    <a href="{% url 'mailing:message_delete' object.pk %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'mailing:messages_list' %}" class="btn btn-light border-primary text-primary">Назад</a></div>
+</div>
+<hr class="featurette-divider">
+{% endblock %}

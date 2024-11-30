@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <script src="/static/js/color-modes.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Главная страница{% endblock %}</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/sidebars.css" rel="stylesheet">
+</head>
+
+<body>
+{% load mail_tags %}
+{% include 'mailing/includes/header.html' %}
+<!-- Top tags menu -->
+<main>
+    <div class="container marketing">
+        <div class="mt-5 row featurette">
+            <div class="col-md-3">
+                {% show_menu %}
+            </div>
+            <div class="col-md-9">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div><!-- /.container -->
+    <!-- FOOTER -->
+    <footer class="container">
+        <p class="float-end"><a href="#">Back to top</a></p>
+        <p>© 2017–2024 Company, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a></p>
+    </footer>
+</main>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/sidebars.js"></script>
+</body>
+</html>

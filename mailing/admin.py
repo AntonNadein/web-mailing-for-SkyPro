@@ -73,17 +73,10 @@ class NewsletterAdmin(admin.ModelAdmin):
 class AttemptToSendAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "name",
         "attempts",
         "status",
         "server_response",
         "newsletter",
     )
-    list_filter = (
-        "name",
-        "status",
-    )
-    ordering = (
-        "status",
-        "name",
-    )
+    list_filter = ("status",)
+    ordering = ("status",)
