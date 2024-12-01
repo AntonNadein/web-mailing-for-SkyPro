@@ -46,9 +46,33 @@ menu = [
 class ListIndex(ListView):
     """Главная страница"""
 
-    model = MailingRecipient
-    context_object_name = "recipients"
+    model = Newsletter
+    context_object_name = "newsletter"
     template_name = "mailing/index.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        result = self.count_newsletter(context)
+        print(result)
+        context["count_status"] = result[0]
+        context["count_newsletter"] = result[1]
+        context["unique_users"] = result[2]
+
+        return context
+
+    def count_newsletter(self, context):
+        count_status = 0
+        count_newsletter = 0
+        user_list = []
+        for i in context["newsletter"]:
+            count_newsletter += 1
+            if i.status == "started":
+                count_status += 1
+            users = i.recipients.all()
+            for user in users:
+                user_list.append(user)
+        unique_users = len(set(user_list))
+        return count_status, count_newsletter, unique_users
 
 
 class MailingRecipientView(ListView):
