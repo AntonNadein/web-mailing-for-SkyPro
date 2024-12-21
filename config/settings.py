@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "mailing",
+
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -106,15 +108,23 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "users.ModelUser"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
-EMAIL_TIMEOUT = os.getenv("EMAIL_TIMEOUT")
-EMAIL_SSL_KEYFILE = os.getenv("EMAIL_SSL_KEYFILE")
-EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE")
+EMAIL_USE_TLS = True if os.getenv("EMAIL_USE_TLS") == "True" else False
+EMAIL_USE_SSL = True if os.getenv("EMAIL_USE_SSL") == "True" else False
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGIN_REDIRECT_URL = "mailing:home_page"
+LOGIN_URL = "users:login"
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+    }
+}

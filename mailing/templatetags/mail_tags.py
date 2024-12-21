@@ -7,8 +7,8 @@ register = template.Library()
 
 
 @register.inclusion_tag("mailing/tags/menu.html")
-def show_menu():
+def show_menu(request):
     for item in menu:
         item["full_url"] = reverse(item["url"])
         item["u_create"] = reverse(item["url_create"])
-    return {"menu": menu}
+    return {"menu": menu, "user": request.user}
