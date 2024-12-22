@@ -37,13 +37,14 @@
                     <li>
                     <form method="post" action="{% url 'users:logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="dropdown-item">Выйти
+                        <button type="submit" class="dropdown-item ms-4">Выйти
                         </button>
                     </form>
                 </li>
                     {% else %}
                     <li><a href="{% url 'users:register' %}" class="link-dark d-inline-flex text-decoration-none rounded">Регистрация</a></li>
                     <li><a href="{% url 'users:login' %}" class="link-dark d-inline-flex text-decoration-none rounded">Войти</a></li>
+                    <li><a href="{% url 'users:password_reset' %}" class="link-dark d-inline-flex text-decoration-none rounded">Забыли пароль?</a></li>
                     {% endif %}
                 </ul>
 
