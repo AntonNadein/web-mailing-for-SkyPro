@@ -5,7 +5,8 @@ from django.db import models
 class ModelUser(AbstractUser):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
-
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
     token = models.CharField(max_length=100, null=True, blank=True, verbose_name="Токен")
 
     USERNAME_FIELD = "email"
@@ -19,3 +20,6 @@ class ModelUser(AbstractUser):
     class Meta:
         verbose_name = "пользователя"
         verbose_name_plural = "Пользователи"
+        permissions = [
+            ("can_block_user", "Can block user"),
+        ]

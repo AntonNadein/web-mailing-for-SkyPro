@@ -1,13 +1,17 @@
 import datetime
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from users.models import ModelUser
 from .forms import MailingRecipientForm, MessageForm, NewsletterForm
+from .mixins import MixinOwner
 from .models import AttemptToSend, MailingRecipient, Message, Newsletter
 
 menu = [
@@ -44,6 +48,63 @@ menu = [
 ]
 
 
+class ModerationMailingRecipientView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Просмотр всех клиентов менеджером"""
+
+    model = MailingRecipient
+    context_object_name = "recipients"
+    template_name = "mailing/moderation/list_recipient.html"
+    permission_required = "mailing.view_all_mailing_recipient"
+
+
+class ModerationNewsletterView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Просмотр всех рассылок менеджером"""
+
+    model = Newsletter
+    context_object_name = "newsletter"
+    template_name = "mailing/moderation/list_newsletter.html"
+    permission_required = "mailing.view_all_newsletter"
+
+    def post(self, request, pk):
+        newsletter = get_object_or_404(Newsletter, id=pk)
+
+        if not request.user.has_perm("mailing.disabling_mailings"):
+            return HttpResponseForbidden("У вас нет прав для отключения рассылки.")
+
+        newsletter.is_active = False
+        newsletter.save()
+
+        messages.success(request, f"Рассылка {newsletter} успешно отключена.")
+
+        return redirect("mailing:newsletter_detail", pk=pk)
+
+
+class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Просмотр списка пользователей сервиса"""
+
+    model = ModelUser
+    context_object_name = "users"
+    template_name = "mailing/moderation/list_users.html"
+    permission_required = "users.can_block_user"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(groups__name='Пользователь')
+
+    def post(self, request, pk):
+        user = get_object_or_404(ModelUser, id=pk)
+
+        if not request.user.has_perm("users.can_block_user"):
+            return HttpResponseForbidden("У вас нет прав для блокировки пользователей.")
+
+        user.is_active = False
+        user.save()
+
+        messages.success(request, f"Пользователь {user.username} успешно заблокирован.")
+
+        return redirect("mailing:moderation_user_list")
+
+
 class ListIndex(ListView):
     """Главная страница"""
 
@@ -54,7 +115,6 @@ class ListIndex(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         result = self.count_newsletter(context)
-        print(result)
         context["count_status"] = result[0]
         context["count_newsletter"] = result[1]
         context["unique_users"] = result[2]
@@ -76,7 +136,7 @@ class ListIndex(ListView):
         return count_status, count_newsletter, unique_users
 
 
-class MailingRecipientView(ListView):
+class MailingRecipientView(LoginRequiredMixin, MixinOwner,  ListView):
     """Получатель рассылки"""
 
     model = MailingRecipient
@@ -84,7 +144,7 @@ class MailingRecipientView(ListView):
     template_name = "mailing/list_recipient.html"
 
 
-class MessageView(ListView):
+class MessageView(LoginRequiredMixin, MixinOwner, ListView):
     """Сообщение"""
 
     model = Message
@@ -92,7 +152,7 @@ class MessageView(ListView):
     template_name = "mailing/list_message.html"
 
 
-class NewsletterView(ListView):
+class NewsletterView(LoginRequiredMixin, MixinOwner, ListView):
     """Рассылка"""
 
     model = Newsletter
@@ -100,7 +160,7 @@ class NewsletterView(ListView):
     template_name = "mailing/list_newsletter.html"
 
 
-class MailingRecipientCreateView(CreateView):
+class MailingRecipientCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     """Получатель рассылки, создание"""
 
     model = MailingRecipient
@@ -109,7 +169,7 @@ class MailingRecipientCreateView(CreateView):
     success_url = reverse_lazy("mailing:recipient_list")
 
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     """Сообщение, создание"""
 
     model = Message
@@ -118,7 +178,7 @@ class MessageCreateView(CreateView):
     success_url = reverse_lazy("mailing:messages_list")
 
 
-class NewsletterCreateView(CreateView):
+class NewsletterCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     """Рассылка, создание"""
 
     model = Newsletter
@@ -195,52 +255,58 @@ class NewsletterDetailView(DetailView):
         )
 
 
-class MailingRecipientUpdateView(UpdateView):
+class MailingRecipientUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     """Получатель рассылки, обновление"""
 
     model = MailingRecipient
     template_name = "mailing/create_recipient.html"
     form_class = MailingRecipientForm
+    permission_required = "mailing.change_mailingrecipient"
     success_url = reverse_lazy("mailing:recipient_list")
 
 
-class MessageUpdateView(UpdateView):
+class MessageUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     """Сообщение, обновление"""
 
     model = Message
     template_name = "mailing/create_message.html"
     form_class = MessageForm
+    permission_required = "mailing.change_message"
     success_url = reverse_lazy("mailing:messages_list")
 
 
-class NewsletterUpdateView(UpdateView):
+class NewsletterUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     """Рассылка, обновление"""
 
     model = Newsletter
     template_name = "mailing/create_newsletter.html"
     form_class = NewsletterForm
+    permission_required = "mailing.change_newsletter"
     success_url = reverse_lazy("mailing:newsletter_list")
 
 
-class MailingRecipientDeleteView(DeleteView):
+class MailingRecipientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Получатель рассылки, удаление"""
 
     model = MailingRecipient
     template_name = "mailing/recipient_confirm_delete.html"
     success_url = reverse_lazy("mailing:recipient_list")
+    permission_required = "mailing.delete_message"
 
 
-class MessageDeleteView(DeleteView):
+class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Сообщение, удаление"""
 
     model = Message
     template_name = "mailing/message_confirm_delete.html"
     success_url = reverse_lazy("mailing:messages_list")
+    permission_required = "mailing.delete_mailingrecipient"
 
 
-class NewsletterDeleteView(DeleteView):
+class NewsletterDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Рассылка, удаление"""
 
     model = Newsletter
     template_name = "mailing/newsletter_confirm_delete.html"
     success_url = reverse_lazy("mailing:newsletter_list")
+    permission_required = "mailing.delete_newsletter"

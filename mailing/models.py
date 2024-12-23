@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from users.models import ModelUser
+
 
 class MailingRecipient(models.Model):
     """Получатель рассылки"""
@@ -17,6 +19,9 @@ class MailingRecipient(models.Model):
         verbose_name="URL",
         help_text="Уникальное имя формируется из фамилии и имени",
     )
+    owner = models.ForeignKey(
+        ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="recipient", verbose_name="Владелец"
+    )
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} {self.patronymic}"
@@ -28,6 +33,9 @@ class MailingRecipient(models.Model):
         verbose_name = "получателя рассылки"
         verbose_name_plural = "Получатель рассылки"
         ordering = ["last_name"]
+        permissions = [
+            ("view_all_mailing_recipient", "View all mailing recipient"),
+        ]
 
 
 class Message(models.Model):
@@ -35,6 +43,9 @@ class Message(models.Model):
 
     title = models.CharField(max_length=250, verbose_name="Тема письма")
     body_message = models.TextField(verbose_name="Тело письма")
+    owner = models.ForeignKey(
+        ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="message", verbose_name="Владелец"
+    )
 
     def __str__(self):
         return self.title
@@ -42,6 +53,9 @@ class Message(models.Model):
     class Meta:
         verbose_name = "сообщение"
         verbose_name_plural = "Сообщение"
+        permissions = [
+            ("view_all_message", "View all message"),
+        ]
 
 
 class Newsletter(models.Model):
@@ -64,6 +78,10 @@ class Newsletter(models.Model):
         verbose_name="Сообщение",
     )
     status = models.CharField(max_length=15, choices=STATUS, verbose_name="Статус")
+    is_active = models.BooleanField(default=True, verbose_name="Активность")
+    owner = models.ForeignKey(
+        ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="newsletter", verbose_name="Владелец"
+    )
     first_dispatch = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время первой отправки")
     end_dispatch = models.DateTimeField(null=True, blank=True, verbose_name="Дата и время окончания отправки")
 
@@ -73,6 +91,10 @@ class Newsletter(models.Model):
     class Meta:
         verbose_name = "рассылку"
         verbose_name_plural = "Рассылка"
+        permissions = [
+            ("view_all_newsletter", "View all newsletter"),
+            ("disabling_mailings", "Disabling mailings"),
+        ]
 
     @property
     def human_readable_status(self):
@@ -91,6 +113,9 @@ class AttemptToSend(models.Model):
     status = models.BooleanField(choices=STATUS, verbose_name="Статус")
     server_response = models.TextField(verbose_name="Ответ почтового сервера")
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="attempt", verbose_name="Владелец"
+    )
 
     def __str__(self):
         return f"Attempt on {self.attempts} - Status: {'Success' if self.status else 'Failure'}"

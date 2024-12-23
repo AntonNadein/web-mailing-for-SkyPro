@@ -22,10 +22,14 @@
         {% endfor %}
         {% endwith %}
     </div>
+    {% if user == object.owner %}
     <div class="mt-5">
         <a href="{% url 'mailing:recipient_update' object.slug %}" class="btn btn-secondary">Редактировать</a>
         <a href="{% url 'mailing:recipient_delete' object.slug %}" class="btn btn-danger">Удалить</a>
         <a href="{% url 'mailing:recipient_list' %}" class="btn btn-light border-primary text-primary">Назад</a></div>
+    {% else %}
+    <a href="{% url 'mailing:moderation_recipient_list' %}" class="btn btn-light border-primary text-primary">Назад</a>
+    {% endif %}
 </div>
 <hr class="featurette-divider">
 {% endblock %}

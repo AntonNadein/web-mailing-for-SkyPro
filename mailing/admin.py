@@ -28,6 +28,7 @@ class MailingRecipientAdmin(admin.ModelAdmin):
         ("patronymic", "slug"),
         "email",
         "comment",
+        "owner",
     ]
 
 
@@ -66,7 +67,7 @@ class NewsletterAdmin(admin.ModelAdmin):
         "name",
     )
     filter_horizontal = ("recipients",)
-    fields = [("name", "status"), "text", "recipients", ("first_dispatch", "end_dispatch")]
+    fields = [("name", "status"), "text", "recipients", ("first_dispatch", "end_dispatch"), "owner", "is_active",]
 
 
 @admin.register(AttemptToSend)

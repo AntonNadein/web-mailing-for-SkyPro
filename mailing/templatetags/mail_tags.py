@@ -11,4 +11,5 @@ def show_menu(request):
     for item in menu:
         item["full_url"] = reverse(item["url"])
         item["u_create"] = reverse(item["url_create"])
-    return {"menu": menu, "user": request.user}
+    is_manager = request.user.groups.filter(name='Менеджер').exists()
+    return {"menu": menu, "user": request.user, "is_manager": is_manager}

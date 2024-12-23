@@ -2,6 +2,7 @@ import secrets
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -22,6 +23,7 @@ class UserCreateView(CreateView):
     success_url = reverse_lazy("users:login")
 
     def form_valid(self, form):
+        """Верификация зарегистрированного пользователя"""
         user = form.save()
         user.is_active = False
         token = secrets.token_hex(16)
@@ -34,6 +36,7 @@ class UserCreateView(CreateView):
         return super().form_valid(form)
 
     def send_welcome_mail(self, user_email, url):
+        """Отправка приветственного сообщения"""
         subject = "Добро пожаловать на наш сайт"
         message = (f"Спасибо, что зарегистрировались в нашем интернет магазине!\n"
                    f"Для подтверждения регистрации перейдите по ссылке {url}")
@@ -43,12 +46,15 @@ class UserCreateView(CreateView):
         ]
         send_mail(subject, message, from_email, recipient_list)
 
+
 def email_verification(request, token):
+    """Активация и добавление прав пользователю"""
     user = get_object_or_404(ModelUser, token=token)
     user.is_active = True
+    group = Group.objects.get(name='Пользователь')
+    user.groups.add(group)
     user.save()
     return redirect(reverse("users:login"))
-
 
 
 class UserLoginView(LoginView):
