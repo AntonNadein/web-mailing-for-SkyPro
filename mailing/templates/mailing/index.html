@@ -1,11 +1,16 @@
 {% extends 'mailing/base.html' %}
 
 {% block content %}
-<h2 class="mt-5 text-center">Статистика</h2>
+<h2 class="mt-5 text-center">{% if user.is_authenticated %}Ваша сатистика{% else %}Статистика по сайту{% endif %}</h2>
 <h3 class="mt-1 text-start">Всего рассылок: <span class="mt-1 text-secondary">{{ count_newsletter }}</span></h3>
 <h3 class="mt-1 text-start">Рассылок запущено: <span class="mt-1 text-secondary">{{ count_status }}</span></h3>
-<h3 class="mt-1 text-start">Уникальных пользователей: <span class="mt-1 text-secondary">{{ unique_users }}</span></h3>
+<h3 class="mt-1 text-start">Уникальных получателей: <span class="mt-1 text-secondary">{{ unique_users }}</span></h3>
 
+{% if user.is_authenticated %}
+<hr class="featurette-divider">
+<h3 class="mt-1 text-start">Успешных рассылок: <span class="mt-1 text-secondary">{{ count_attempt_successful }}</span></h3>
+<h3 class="mt-1 text-start">Неуспешных рассылок: <span class="mt-1 text-secondary">{{ count_attempt_fail }}</span></h3>
+<h3 class="mt-1 text-start">Сообщений отравлено: <span class="mt-1 text-secondary">{{ count_message }}</span></h3>
 <h4 class="mt-5 text-center">Запущенные рассылки</h4>
 <table class="table table-striped">
     <thead>
@@ -32,8 +37,15 @@
         <td><a class="link" href="{% url 'mailing:newsletter_detail' news.pk %}">Подробнее</a></td>
     </tr>
     {% endif %}
+    {% empty %}
+    <tr>
+        <td colspan="7" class="text-center">Нет запущенных рассылок для отображения.</td>
+    </tr>
+
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
+
 <hr class="featurette-divider">
 {% endblock %}

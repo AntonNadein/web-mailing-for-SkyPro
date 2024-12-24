@@ -1,5 +1,7 @@
 from django import forms
 
+from transliterate import translit
+
 from mailing.models import MailingRecipient, Message, Newsletter
 
 
@@ -23,6 +25,23 @@ class MailingRecipientForm(MixinForms, forms.ModelForm):
             "comment",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'slug' not in self.initial:
+            self.fields['slug'].initial = 'default-slug'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+        slug = cleaned_data.get('slug')
+
+        if first_name and last_name and 'default-slug' in slug:
+            generated_slug = f"{first_name}-{last_name}"
+            cleaned_data['slug'] = translit(generated_slug.lower(), 'ru', reversed=True)
+
+        return cleaned_data
+
 
 class MessageForm(MixinForms, forms.ModelForm):
 
@@ -43,6 +62,13 @@ class NewsletterForm(MixinForms, forms.ModelForm):
             "recipients",
             "text",
             "status",
-            "first_dispatch",
-            "end_dispatch",
         ]
+
+    def __init__(self, *args, **kwargs):
+        # делаем фильтрацию форм для авторизованных пользователей
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if self.user is not None:
+            self.fields['text'].queryset = Message.objects.filter(owner=self.user)
+            self.fields['recipients'].queryset = MailingRecipient.objects.filter(owner=self.user)

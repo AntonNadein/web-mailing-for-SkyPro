@@ -12,6 +12,7 @@ python-dotenv = "^1.0.1"
 psycopg2-binary = "^2.9.10"
 
 ipython = "^8.29.0"
+transliterate = "^1.10.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

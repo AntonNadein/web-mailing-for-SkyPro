@@ -13,6 +13,7 @@ from users.models import ModelUser
 from .forms import MailingRecipientForm, MessageForm, NewsletterForm
 from .mixins import MixinOwner
 from .models import AttemptToSend, MailingRecipient, Message, Newsletter
+from .services import IndexCounter
 
 menu = [
     {
@@ -112,28 +113,28 @@ class ListIndex(ListView):
     context_object_name = "newsletter"
     template_name = "mailing/index.html"
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            return queryset.filter(owner=user)
+        return queryset
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        result = self.count_newsletter(context)
+
+        result = IndexCounter.count_newsletter(context)
         context["count_status"] = result[0]
         context["count_newsletter"] = result[1]
         context["unique_users"] = result[2]
 
-        return context
+        if self.request.user.is_authenticated:
+            result_2 = IndexCounter.count_attempt_to_send(self.request.user)
+            context["count_attempt_successful"] = result_2[0]
+            context["count_attempt_fail"] = result_2[1]
+            context["count_message"] = result_2[2]
 
-    def count_newsletter(self, context):
-        count_status = 0
-        count_newsletter = 0
-        user_list = []
-        for i in context["newsletter"]:
-            count_newsletter += 1
-            if i.status == "started":
-                count_status += 1
-            users = i.recipients.all()
-            for user in users:
-                user_list.append(user)
-        unique_users = len(set(user_list))
-        return count_status, count_newsletter, unique_users
+        return context
 
 
 class MailingRecipientView(LoginRequiredMixin, MixinOwner,  ListView):
@@ -186,6 +187,13 @@ class NewsletterCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     form_class = NewsletterForm
     success_url = reverse_lazy("mailing:newsletter_list")
 
+    def get_form_kwargs(self):
+        """Добавляем текущего пользователя в kwargs для формы"""
+
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
 
 class MailingRecipientDetailView(DetailView):
     """Получатель рассылки, детали"""
@@ -211,14 +219,17 @@ class NewsletterDetailView(DetailView):
     template_name = "mailing/detail_newsletter.html"
 
     def post(self, request, *args, **kwargs):
-        # получение и изменение данных рассылки
+        """Получение и изменение данных рассылки"""
+
         newsletter = self.get_object()
         newsletter.status = "started"
         newsletter.first_dispatch = datetime.datetime.now()
         newsletter.save()
 
         # создаем экземпляр для регистрации попыток рассылок в БД
-        attempt = AttemptToSend(attempts=datetime.datetime.now(), status=False, newsletter=newsletter)
+        owner = newsletter.owner
+        attempt = AttemptToSend(attempts=datetime.datetime.now(), status=False, newsletter=newsletter, owner=owner)
+
 
         # логика отправки сообщения
         try:

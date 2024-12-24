@@ -118,7 +118,7 @@ class AttemptToSend(models.Model):
     )
 
     def __str__(self):
-        return f"Attempt on {self.attempts} - Status: {'Success' if self.status else 'Failure'}"
+        return f"Попытка от {self.attempts} - Статус: {'Успешно' if self.status else 'Не успешно'}"
 
     class Meta:
         verbose_name = "попытки рассылок"
