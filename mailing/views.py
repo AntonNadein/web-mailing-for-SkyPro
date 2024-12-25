@@ -3,17 +3,19 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from users.models import ModelUser
+
 from .forms import MailingRecipientForm, MessageForm, NewsletterForm
-from .mixins import MixinOwner
+from .mixins import CachedViewMixin
 from .models import AttemptToSend, MailingRecipient, Message, Newsletter
-from .services import IndexCounter
+from .services import CachedCreateView, CachedDeleteView, CachedListView, CachedUpdateView, IndexCounter
 
 menu = [
     {
@@ -49,7 +51,7 @@ menu = [
 ]
 
 
-class ModerationMailingRecipientView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class ModerationMailingRecipientView(LoginRequiredMixin, PermissionRequiredMixin, CachedViewMixin, ListView):
     """Просмотр всех клиентов менеджером"""
 
     model = MailingRecipient
@@ -57,14 +59,34 @@ class ModerationMailingRecipientView(LoginRequiredMixin, PermissionRequiredMixin
     template_name = "mailing/moderation/list_recipient.html"
     permission_required = "mailing.view_all_mailing_recipient"
 
+    def get_queryset(self):
+        """Получает queryset, пытаясь использовать кэш."""
+        queryset = self.get_cached_queryset()
+        if queryset is not None:
+            return queryset
 
-class ModerationNewsletterView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+        queryset = super().get_queryset()
+        self.cache_queryset(queryset)
+        return queryset
+
+
+class ModerationNewsletterView(LoginRequiredMixin, PermissionRequiredMixin, CachedViewMixin, ListView):
     """Просмотр всех рассылок менеджером"""
 
     model = Newsletter
     context_object_name = "newsletter"
     template_name = "mailing/moderation/list_newsletter.html"
     permission_required = "mailing.view_all_newsletter"
+
+    def get_queryset(self):
+        """Получает queryset, пытаясь использовать кэш."""
+        queryset = self.get_cached_queryset()
+        if queryset is not None:
+            return queryset
+
+        queryset = super().get_queryset()
+        self.cache_queryset(queryset)
+        return queryset
 
     def post(self, request, pk):
         newsletter = get_object_or_404(Newsletter, id=pk)
@@ -80,7 +102,7 @@ class ModerationNewsletterView(LoginRequiredMixin, PermissionRequiredMixin, List
         return redirect("mailing:newsletter_detail", pk=pk)
 
 
-class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin, CachedViewMixin, ListView):
     """Просмотр списка пользователей сервиса"""
 
     model = ModelUser
@@ -89,8 +111,16 @@ class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin, ListView)
     permission_required = "users.can_block_user"
 
     def get_queryset(self):
+        """Получает queryset, пытаясь использовать кэш."""
+        queryset = self.get_cached_queryset()
+        if queryset is not None:
+            return queryset
+
         queryset = super().get_queryset()
-        return queryset.filter(groups__name='Пользователь')
+        queryset = queryset.filter(groups__name="Пользователь")
+        self.cache_queryset(queryset)
+
+        return queryset
 
     def post(self, request, pk):
         user = get_object_or_404(ModelUser, id=pk)
@@ -137,7 +167,7 @@ class ListIndex(ListView):
         return context
 
 
-class MailingRecipientView(LoginRequiredMixin, MixinOwner,  ListView):
+class MailingRecipientView(CachedListView):
     """Получатель рассылки"""
 
     model = MailingRecipient
@@ -145,7 +175,7 @@ class MailingRecipientView(LoginRequiredMixin, MixinOwner,  ListView):
     template_name = "mailing/list_recipient.html"
 
 
-class MessageView(LoginRequiredMixin, MixinOwner, ListView):
+class MessageView(CachedListView):
     """Сообщение"""
 
     model = Message
@@ -153,7 +183,7 @@ class MessageView(LoginRequiredMixin, MixinOwner, ListView):
     template_name = "mailing/list_message.html"
 
 
-class NewsletterView(LoginRequiredMixin, MixinOwner, ListView):
+class NewsletterView(CachedListView):
     """Рассылка"""
 
     model = Newsletter
@@ -161,7 +191,7 @@ class NewsletterView(LoginRequiredMixin, MixinOwner, ListView):
     template_name = "mailing/list_newsletter.html"
 
 
-class MailingRecipientCreateView(LoginRequiredMixin, MixinOwner, CreateView):
+class MailingRecipientCreateView(CachedCreateView):
     """Получатель рассылки, создание"""
 
     model = MailingRecipient
@@ -170,7 +200,7 @@ class MailingRecipientCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     success_url = reverse_lazy("mailing:recipient_list")
 
 
-class MessageCreateView(LoginRequiredMixin, MixinOwner, CreateView):
+class MessageCreateView(CachedCreateView):
     """Сообщение, создание"""
 
     model = Message
@@ -179,7 +209,7 @@ class MessageCreateView(LoginRequiredMixin, MixinOwner, CreateView):
     success_url = reverse_lazy("mailing:messages_list")
 
 
-class NewsletterCreateView(LoginRequiredMixin, MixinOwner, CreateView):
+class NewsletterCreateView(CachedCreateView):
     """Рассылка, создание"""
 
     model = Newsletter
@@ -191,10 +221,11 @@ class NewsletterCreateView(LoginRequiredMixin, MixinOwner, CreateView):
         """Добавляем текущего пользователя в kwargs для формы"""
 
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs["user"] = self.request.user
         return kwargs
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class MailingRecipientDetailView(DetailView):
     """Получатель рассылки, детали"""
 
@@ -203,6 +234,7 @@ class MailingRecipientDetailView(DetailView):
     template_name = "mailing/detail_recipient.html"
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class MessageDetailView(DetailView):
     """Сообщение, детали"""
 
@@ -229,7 +261,6 @@ class NewsletterDetailView(DetailView):
         # создаем экземпляр для регистрации попыток рассылок в БД
         owner = newsletter.owner
         attempt = AttemptToSend(attempts=datetime.datetime.now(), status=False, newsletter=newsletter, owner=owner)
-
 
         # логика отправки сообщения
         try:
@@ -266,7 +297,7 @@ class NewsletterDetailView(DetailView):
         )
 
 
-class MailingRecipientUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
+class MailingRecipientUpdateView(PermissionRequiredMixin, CachedUpdateView):
     """Получатель рассылки, обновление"""
 
     model = MailingRecipient
@@ -276,7 +307,7 @@ class MailingRecipientUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     success_url = reverse_lazy("mailing:recipient_list")
 
 
-class MessageUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
+class MessageUpdateView(PermissionRequiredMixin, CachedUpdateView):
     """Сообщение, обновление"""
 
     model = Message
@@ -286,7 +317,7 @@ class MessageUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     success_url = reverse_lazy("mailing:messages_list")
 
 
-class NewsletterUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
+class NewsletterUpdateView(PermissionRequiredMixin, CachedUpdateView):
     """Рассылка, обновление"""
 
     model = Newsletter
@@ -296,7 +327,7 @@ class NewsletterUpdateView(LoginRequiredMixin, MixinOwner, UpdateView):
     success_url = reverse_lazy("mailing:newsletter_list")
 
 
-class MailingRecipientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MailingRecipientDeleteView(PermissionRequiredMixin, CachedDeleteView):
     """Получатель рассылки, удаление"""
 
     model = MailingRecipient
@@ -305,7 +336,7 @@ class MailingRecipientDeleteView(LoginRequiredMixin, PermissionRequiredMixin, De
     permission_required = "mailing.delete_message"
 
 
-class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MessageDeleteView(PermissionRequiredMixin, CachedDeleteView):
     """Сообщение, удаление"""
 
     model = Message
@@ -314,7 +345,7 @@ class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     permission_required = "mailing.delete_mailingrecipient"
 
 
-class NewsletterDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class NewsletterDeleteView(PermissionRequiredMixin, CachedDeleteView):
     """Рассылка, удаление"""
 
     model = Newsletter

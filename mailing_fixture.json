@@ -4,11 +4,12 @@
     "pk": 1,
     "fields": {
         "first_name": "Иван",
-        "last_name": "Иванов",
+        "last_name": "Иванов!",
         "patronymic": "Юрьевич",
         "email": "test2@test.ru",
         "comment": "",
-        "slug": "ivan-ivanov"
+        "slug": "ivan_ivanov",
+        "owner": 5
     }
 },
 {
@@ -16,82 +17,135 @@
     "pk": 2,
     "fields": {
         "first_name": "Петр",
-        "last_name": "Иванов",
-        "patronymic": null,
-        "email": "test@test.ru",
-        "comment": "",
-        "slug": "petr-ivanov"
-    }
-},
-{
-    "model": "mailing.mailingrecipient",
-    "pk": 3,
-    "fields": {
-        "first_name": "Иван",
         "last_name": "Петров",
-        "patronymic": null,
-        "email": "test3@test.ru",
+        "patronymic": "Иванович",
+        "email": "Fynjy-6662@yandex.ru",
         "comment": "",
-        "slug": "ivan-petrov"
+        "slug": "petrov_petr",
+        "owner": 5
     }
 },
 {
     "model": "mailing.mailingrecipient",
     "pk": 4,
     "fields": {
-        "first_name": "Петр",
-        "last_name": "Петров",
-        "patronymic": "Иванович",
-        "email": "test4@test.ru",
+        "first_name": "Тесто",
+        "last_name": "Тестов",
+        "patronymic": null,
+        "email": "test-2@test.ru",
         "comment": "",
-        "slug": "petr-petrov"
+        "slug": "test_test",
+        "owner": 7
     }
 },
 {
     "model": "mailing.mailingrecipient",
     "pk": 5,
     "fields": {
-        "first_name": "Антон",
-        "last_name": "Надеин",
-        "patronymic": "Валерьевич",
-        "email": "fynjy-666@mail.ru",
+        "first_name": "Анна",
+        "last_name": "Петрова",
+        "patronymic": "Ивановна",
+        "email": "test4@test.ru",
         "comment": "",
-        "slug": "anton-nadein"
+        "slug": "anna-petrova",
+        "owner": 5
     }
 },
 {
     "model": "mailing.message",
     "pk": 1,
     "fields": {
-        "title": "Тестовое письмо",
-        "body_message": "Для тестирования шрифтов часто используют панграмму — текст, в котором встречаются все буквы алфавита. 14 Это нужно для того, чтобы пользователь увидел, как отображается тот или иной шрифт сразу на всех буквах и выбрал подходящее начертание. 1\r\n\r\nОдна из популярных панграмм — «Съешь ещё этих мягких французских булок да выпей чаю». 14 Полная фраза без купюр: «Съешь же ещё этих мягких французских булок да выпей чаю». 2\r\n\r\nТакже для тестирования шрифтов в некоторых операционных системах используются и другие панграммы, например:"
+        "title": "Наклейки для планера",
+        "body_message": "Только сегодня наклейки для планера со скидкой 20%!",
+        "owner": 5
     }
 },
 {
     "model": "mailing.message",
     "pk": 2,
     "fields": {
-        "title": "Тестовое письмо 2",
-        "body_message": "Для тестирования шрифтов часто используют панграмму — текст, в котором встречаются все буквы алфавита. 14 Это нужно для того, чтобы пользователь увидел, как отображается тот или иной шрифт сразу на всех буквах и выбрал подходящее начертание. 1\r\n\r\nОдна из популярных панграмм — «Съешь ещё этих мягких французских булок да выпей чаю». 14 Полная фраза без купюр: «Съешь же ещё этих мягких французских булок да выпей чаю». 2\r\n\r\nТакже для тестирования шрифтов в некоторых операционных системах используются и другие панграммы, например:"
+        "title": "Телефоны! Бесплатная доставка!",
+        "body_message": "Акция недели. Телефоны! Бесплатная доставка.",
+        "owner": 5
     }
 },
 {
     "model": "mailing.message",
-    "pk": 3,
+    "pk": 5,
     "fields": {
-        "title": "Тестовое письмо 3",
-        "body_message": "Для тестирования шрифтов часто используют панграмму — текст, в котором встречаются все буквы алфавита. 14 Это нужно для того, чтобы пользователь увидел, как отображается тот или иной шрифт сразу на всех буквах и выбрал подходящее начертание. 1\r\n\r\nОдна из популярных панграмм — «Съешь ещё этих мягких французских булок да выпей чаю». 14 Полная фраза без купюр: «Съешь же ещё этих мягких французских булок да выпей чаю». 2\r\n\r\nТакже для тестирования шрифтов в некоторых операционных системах используются и другие панграммы, например:"
+        "title": "Тестовое письмо",
+        "body_message": "Проверка связи тестового сервиса.",
+        "owner": 7
+    }
+},
+{
+    "model": "mailing.message",
+    "pk": 6,
+    "fields": {
+        "title": "Тестовое письмо 2",
+        "body_message": "Тестовое письмо 2",
+        "owner": 5
     }
 },
 {
     "model": "mailing.newsletter",
     "pk": 1,
     "fields": {
-        "name": "Рассылка 1",
+        "name": "Наклейки",
         "text": 1,
+        "status": "started",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T11:24:47.623Z",
+        "end_dispatch": "2024-12-24T11:23:29.635Z",
+        "recipients": [
+            1
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 2,
+    "fields": {
+        "name": "Смартфон, бесплатная доставка.",
+        "text": 2,
+        "status": "completed",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T11:42:03.065Z",
+        "end_dispatch": "2024-12-24T11:42:04.138Z",
+        "recipients": [
+            2
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 4,
+    "fields": {
+        "name": "Тестовая рассылка",
+        "text": 5,
         "status": "created",
+        "is_active": true,
+        "owner": 7,
         "first_dispatch": null,
         "end_dispatch": null,
+        "recipients": [
+            4
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 7,
+    "fields": {
+        "name": "Тестовая рассылка",
+        "text": 2,
+        "status": "completed",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T12:08:54.778Z",
+        "end_dispatch": "2024-12-24T12:08:54.807Z",
         "recipients": [
             1,
             2,
@@ -100,35 +154,102 @@
     }
 },
 {
-    "model": "mailing.newsletter",
-    "pk": 2,
+    "model": "mailing.attempttosend",
+    "pk": 11,
     "fields": {
-        "name": "Рассылка 2",
-        "text": 2,
-        "status": "created",
-        "first_dispatch": null,
-        "end_dispatch": null,
-        "recipients": [
-            4
-        ]
+        "attempts": "2024-12-22T18:17:22Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 7
     }
 },
 {
-    "model": "mailing.newsletter",
-    "pk": 3,
+    "model": "mailing.attempttosend",
+    "pk": 12,
     "fields": {
-        "name": "Рассылка 3",
-        "text": 3,
-        "status": "created",
-        "first_dispatch": null,
-        "end_dispatch": null,
-        "recipients": [
-            1,
-            2,
-            5,
-            3,
-            4
-        ]
+        "attempts": "2024-12-24T11:18:02Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 6
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 13,
+    "fields": {
+        "attempts": "2024-12-24T11:23:29.615Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 14,
+    "fields": {
+        "attempts": "2024-12-24T11:24:47.630Z",
+        "status": false,
+        "server_response": "{'test2@test.ru': (550, b'non-local recipient verification failed')}",
+        "newsletter": 1,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 15,
+    "fields": {
+        "attempts": "2024-12-24T11:29:13.314Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 2,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 16,
+    "fields": {
+        "attempts": "2024-12-24T11:36:14.059Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 7,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 17,
+    "fields": {
+        "attempts": "2024-12-24T11:39:56.535Z",
+        "status": false,
+        "server_response": "{'test2@test.ru': (550, b'non-local recipient verification failed')}",
+        "newsletter": 7,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 18,
+    "fields": {
+        "attempts": "2024-12-24T11:42:03.073Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 2,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 19,
+    "fields": {
+        "attempts": "2024-12-24T12:08:54.788Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 7,
+        "owner": 5
     }
 }
 ]

@@ -1,7 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, UserCreationForm
 
 from mailing.forms import MixinForms
+
 from .models import ModelUser
 
 
@@ -17,16 +18,19 @@ class MixinValidPhoneNumber:
 
 class UserAuthenticationForm(MixinForms, AuthenticationForm):
     """Форма авторизации"""
+
     pass
 
 
 class UserPasswordResetForm(MixinForms, PasswordResetForm):
     """Форма ввода E-mail для сброса пароля"""
+
     pass
 
 
 class UserSetPasswordForm(MixinForms, SetPasswordForm):
     """Форма сброса пароля"""
+
     pass
 
 
