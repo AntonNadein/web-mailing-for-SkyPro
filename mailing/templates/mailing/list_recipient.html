@@ -1,0 +1,40 @@
+{% extends 'mailing/base.html' %}
+{% block title %}Получатели рассылки{% endblock %}
+
+{% block content %}
+
+<h2 class="mt-2 text-center">Получатели рассылки</h2>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Фамилия</th>
+        <th scope="col">Имя</th>
+        <th scope="col">Отчество</th>
+        <th scope="col">Email</th>
+        <th scope="col">Детали</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for recipient in recipients %}
+    <tr>
+        <th scope="row">{{ recipient.id }}</th>
+        <td>{{ recipient.last_name }}</td>
+        <td>{{ recipient.first_name }}</td>
+        {% if recipient.patronymic %}
+        <td>{{ recipient.patronymic }}</td>
+        {% else %}
+        <td>-</td>
+        {% endif %}
+        <td>{{ recipient.email }}</td>
+        <td><a class="link" href="{% url 'mailing:recipient_detail' recipient.slug %}">Подробнее</a></td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7" class="text-center">Нет клиентов для отображения.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr class="featurette-divider">
+{% endblock %}

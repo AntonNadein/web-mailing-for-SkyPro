@@ -1,0 +1,255 @@
+[
+{
+    "model": "mailing.mailingrecipient",
+    "pk": 1,
+    "fields": {
+        "first_name": "Иван",
+        "last_name": "Иванов!",
+        "patronymic": "Юрьевич",
+        "email": "test2@test.ru",
+        "comment": "",
+        "slug": "ivan_ivanov",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.mailingrecipient",
+    "pk": 2,
+    "fields": {
+        "first_name": "Петр",
+        "last_name": "Петров",
+        "patronymic": "Иванович",
+        "email": "Fynjy-6662@yandex.ru",
+        "comment": "",
+        "slug": "petrov_petr",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.mailingrecipient",
+    "pk": 4,
+    "fields": {
+        "first_name": "Тесто",
+        "last_name": "Тестов",
+        "patronymic": null,
+        "email": "test-2@test.ru",
+        "comment": "",
+        "slug": "test_test",
+        "owner": 7
+    }
+},
+{
+    "model": "mailing.mailingrecipient",
+    "pk": 5,
+    "fields": {
+        "first_name": "Анна",
+        "last_name": "Петрова",
+        "patronymic": "Ивановна",
+        "email": "test4@test.ru",
+        "comment": "",
+        "slug": "anna-petrova",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.message",
+    "pk": 1,
+    "fields": {
+        "title": "Наклейки для планера",
+        "body_message": "Только сегодня наклейки для планера со скидкой 20%!",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.message",
+    "pk": 2,
+    "fields": {
+        "title": "Телефоны! Бесплатная доставка!",
+        "body_message": "Акция недели. Телефоны! Бесплатная доставка.",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.message",
+    "pk": 5,
+    "fields": {
+        "title": "Тестовое письмо",
+        "body_message": "Проверка связи тестового сервиса.",
+        "owner": 7
+    }
+},
+{
+    "model": "mailing.message",
+    "pk": 6,
+    "fields": {
+        "title": "Тестовое письмо 2",
+        "body_message": "Тестовое письмо 2",
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 1,
+    "fields": {
+        "name": "Наклейки",
+        "text": 1,
+        "status": "started",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T11:24:47.623Z",
+        "end_dispatch": "2024-12-24T11:23:29.635Z",
+        "recipients": [
+            1
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 2,
+    "fields": {
+        "name": "Смартфон, бесплатная доставка.",
+        "text": 2,
+        "status": "completed",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T11:42:03.065Z",
+        "end_dispatch": "2024-12-24T11:42:04.138Z",
+        "recipients": [
+            2
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 4,
+    "fields": {
+        "name": "Тестовая рассылка",
+        "text": 5,
+        "status": "created",
+        "is_active": true,
+        "owner": 7,
+        "first_dispatch": null,
+        "end_dispatch": null,
+        "recipients": [
+            4
+        ]
+    }
+},
+{
+    "model": "mailing.newsletter",
+    "pk": 7,
+    "fields": {
+        "name": "Тестовая рассылка",
+        "text": 2,
+        "status": "completed",
+        "is_active": true,
+        "owner": 5,
+        "first_dispatch": "2024-12-24T12:08:54.778Z",
+        "end_dispatch": "2024-12-24T12:08:54.807Z",
+        "recipients": [
+            1,
+            2,
+            5
+        ]
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 11,
+    "fields": {
+        "attempts": "2024-12-22T18:17:22Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 7
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 12,
+    "fields": {
+        "attempts": "2024-12-24T11:18:02Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 6
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 13,
+    "fields": {
+        "attempts": "2024-12-24T11:23:29.615Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 1,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 14,
+    "fields": {
+        "attempts": "2024-12-24T11:24:47.630Z",
+        "status": false,
+        "server_response": "{'test2@test.ru': (550, b'non-local recipient verification failed')}",
+        "newsletter": 1,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 15,
+    "fields": {
+        "attempts": "2024-12-24T11:29:13.314Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 2,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 16,
+    "fields": {
+        "attempts": "2024-12-24T11:36:14.059Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 7,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 17,
+    "fields": {
+        "attempts": "2024-12-24T11:39:56.535Z",
+        "status": false,
+        "server_response": "{'test2@test.ru': (550, b'non-local recipient verification failed')}",
+        "newsletter": 7,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 18,
+    "fields": {
+        "attempts": "2024-12-24T11:42:03.073Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 2,
+        "owner": 5
+    }
+},
+{
+    "model": "mailing.attempttosend",
+    "pk": 19,
+    "fields": {
+        "attempts": "2024-12-24T12:08:54.788Z",
+        "status": true,
+        "server_response": "Рассылка успешно отправлена",
+        "newsletter": 7,
+        "owner": 5
+    }
+}
+]

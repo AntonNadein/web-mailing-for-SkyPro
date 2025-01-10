@@ -1,0 +1,32 @@
+{% extends 'mailing/base.html' %}
+{% block title %}Список сообщений{% endblock %}
+
+{% block content %}
+
+<h2 class="mt-2 text-center">Список сообщений</h2>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Заголовок</th>
+        <th scope="col">Сообщение</th>
+        <th scope="col">Детали</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for message in messages %}
+    <tr>
+        <th scope="row">{{ message.id }}</th>
+        <td>{{ message.title }}</td>
+        <td>{{ message.body_message|truncatechars:200 }}</td>
+        <td><a class="link" href="{% url 'mailing:message_detail' message.pk %}">Подробнее</a></td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4" class="text-center">Нет сообщений для отображения.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr class="featurette-divider">
+{% endblock %}

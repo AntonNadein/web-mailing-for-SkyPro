@@ -1,0 +1,18 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}{% if object %}Редактирование профиля{% else %}Регистрация{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="col-10 mt-5">
+    <h2>Регистрация</h2>
+    <div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">{% if object %}Применить{% else %}Зарегистрироваться{% endif %}</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

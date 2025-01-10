@@ -1,0 +1,74 @@
+<div class="flex-shrink-0 p-3" style="width: 280px;">
+    <a href="/" class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom">
+        <span class="fs-5 fw-semibold">Меню</span>
+    </a>
+    <ul class="list-unstyled ps-0">
+        {% for m in menu %}
+        <li class="mb-1">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-1 collapsed"
+                    data-bs-toggle="collapse" data-bs-target="#{{ m.unique }}-collapse" aria-expanded="false">
+                {{ m.title }}
+            </button>
+            <div class="collapse" id="{{ m.unique }}-collapse" style="">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 middle">
+                    <li><a href="{{ m.full_url }}"
+                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ m.list }}</a></li>
+                    <li><a href="{{ m.u_create }}"
+                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ m.create }}</a></li>
+                </ul>
+            </div>
+        </li>
+        {% endfor %}
+        <!-- Manager -->
+        {% if is_manager %}
+        <li class="border-top my-3"></li>
+        <li class="mb-1">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                    data-bs-toggle="collapse" data-bs-target="#manager-collapse" aria-expanded="false">
+                Менеджер
+            </button>
+            <div class="collapse" id="manager-collapse" style="">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li><a href="{% url 'mailing:moderation_newsletter_list' %}"
+                           class="link-dark d-inline-flex text-decoration-none rounded">Список всех рассылок</a></li>
+                    <li><a href="{% url 'mailing:moderation_recipient_list' %}" class="link-dark d-inline-flex text-decoration-none rounded">Список всех клиентов</a>
+                    </li>
+                    <li><a href="{% url 'mailing:moderation_user_list' %}"
+                           class="link-dark d-inline-flex text-decoration-none rounded">Список всех пользователей</a></li>
+
+                </ul>
+
+            </div>
+        </li>
+        {% endif %}
+        <!-- Account -->
+        <li class="border-top my-3"></li>
+        <li class="mb-1">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                    data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
+                Аккаунт
+            </button>
+            <div class="collapse" id="account-collapse" style="">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <form method="post" action="{% url 'users:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item ms-4">Выйти
+                            </button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'users:register' %}"
+                           class="link-dark d-inline-flex text-decoration-none rounded">Регистрация</a></li>
+                    <li><a href="{% url 'users:login' %}" class="link-dark d-inline-flex text-decoration-none rounded">Войти</a>
+                    </li>
+                    <li><a href="{% url 'users:password_reset' %}"
+                           class="link-dark d-inline-flex text-decoration-none rounded">Забыли пароль?</a></li>
+                    {% endif %}
+                </ul>
+
+            </div>
+        </li>
+    </ul>
+</div>
